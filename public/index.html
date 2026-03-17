@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Pizza Admin Panel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+    }
+    button {
+      cursor: pointer;
+      background: black;
+      color: white;
+      border: none;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🍕 Admin Panel</h1>
+
+<div class="card" id="loginCard">
+  <h2>Login</h2>
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+</div>
+
+<div class="card" id="eventCard" style="display:none;">
+  <h2>Event erstellen</h2>
+  <input id="eventName" placeholder="Event Name">
+  <button onclick="createEventHandler()">Create Event</button>
+  <p id="eventIdDisplay"></p>
+</div>
+
+<div class="card" id="toppingCard" style="display:none;">
+  <h2>Toppings hinzufügen</h2>
+  <input id="toppingInput" placeholder="z.B. Salami">
+  <button onclick="addTopping()">Add Topping</button>
+  <ul id="toppingList"></ul>
+  <button onclick="saveToppings()">Save Toppings</button>
+</div>
+
+<script>
+const API_BASE = '/api'; // wichtig: gleiche Domain
+
+let token = null;
+let currentEventId = null;
+let toppings = [];
+
+async function login() {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+
+  const res = await fetch(`${API_BASE}/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+
+  const data = await res.json();
+  token = data.token;
+
+  document.getElementById('loginCard').style.display = 'none';
+  document.getElementById('eventCard').style.display = 'block';
+}
+
+async function createEventHandler() {
+  const name = document.getElementById('eventName').value;
+
+  const res = await fetch(`${API_BASE}/events`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    },
+    body: JSON.stringify({ name })
+    
+  });
+  console.log('TOKEN:',token);
+  const data = await res.json();
+  currentEventId = data.id;
+
+  document.getElementById('eventIdDisplay').innerText = 'Event ID: ' + data.id;
+  document.getElementById('toppingCard').style.display = 'block';
+}
+
+function addTopping() {
+  const input = document.getElementById('toppingInput');
+  const value = input.value;
+
+  if (!value) return;s
+
+  toppings.push(value);
+
+  const li = document.createElement('li');
+  li.innerText = value;
+  document.getElementById('toppingList').appendChild(li);
+
+  input.value = '';
+}
+
+async function saveToppings() {
+  await fetch(`${API_BASE}/events/${currentEventId}/toppings`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    },
+    body: JSON.stringify({ toppings })
+  });
+
+  alert('Toppings gespeichert 🍕');
+}
+</script>
+
+</body>
+</html>
