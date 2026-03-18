@@ -15,7 +15,8 @@ app.use('/admin', express.static(path.join(__dirname, '../public')));
 // API routes
 app.use('/api/login', authRoutes);
 app.use('/api/events', eventRoutes);
-app.use('/api/events/:eventId/toppings', toppingRoutes);
+//app.use('/api/events/', toppingRoutes);
+app.use('/api', toppingRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server läuft auf ${PORT}`));

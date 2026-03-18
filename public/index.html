@@ -9,6 +9,20 @@
       background: #f5f5f5;
       padding: 20px;
     }
+    .button2 {
+      background: rgb(77, 125, 216);
+      color: white;
+      border: none;
+      padding: 16px 14px;
+      text-align: center;
+      text-decoration: none;
+      width: auto;
+      display: inline-block;
+      font-size: 12px;
+      cursor: pointer;
+      flex: 0 0 auto;  
+      border-radius: 25%;
+    }
     .card {
       background: white;
       padding: 20px;
@@ -31,11 +45,97 @@
       list-style: none;
       padding: 0;
     }
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid #eee;
+    }
+    li span {
+      white-space: nowrap;      /* kein Umbruch */
+      overflow: hidden;
+      text-overflow: ellipsis;  /* ... wenn zu lang */
+      max-width: 80%;
+    }
+    li.active {
+      background: #d1f7f1;
+      border-radius: 6px;
+    }   
+    #toppingsList li {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+body {
+  padding-top: 60px;
+}
+.nav-buttons button.active {
+  background: rgb(40, 150, 130);
+}
+.topbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 20%;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: flex-end;
+  z-index: 1000;
+
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-buttons button {
+  background: rgb(81, 225, 201);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 8px;
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+/* Hover */
+.nav-buttons button:hover {
+  background: rgb(60, 200, 180);
+  transform: translateY(-1px);
+}
+
+/* Klick-Effekt */
+.nav-buttons button:active {
+  transform: scale(0.95);
+}
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+
   </style>
 </head>
 <body>
 
 <h1>🍕 Admin Panel</h1>
+<div id="topbar1" class="topbar" style="display:none;">
+  <div class="nav-buttons">
+    <button onclick="showView('view-addEvent')">Events hinzufeugen</button>
+    <button onclick="showView('view-events')">Events anschauen</button>
+    <button onclick="showView('view-orders')">Penis?</button>
+  </div>
+</div>
+
+
 
 <div class="card" id="loginCard">
   <h2>Login</h2>
@@ -44,20 +144,35 @@
   <button onclick="login()">Login</button>
 </div>
 
-<div class="card" id="eventCard" style="display:none;">
-  <h2>Event erstellen</h2>
-  <input id="eventName" placeholder="Event Name">
-  <button onclick="createEventHandler()">Create Event</button>
-  <p id="eventIdDisplay"></p>
+
+<div id = "view-addEvent" class="view">
+  <div class="card" id="eventCard" style="display:block;">
+    <h2>Event erstellen</h2>
+    <input id="eventName" placeholder="Event Name">
+    <button onclick="createEventHandler()">Create Event</button>
+    <p id="eventIdDisplay"></p>
+  </div>
+
+  <div class="card" id="toppingCard" style="display:none;">
+    <h2>Toppings hinzufügen</h2>
+    <input id="toppingInput" placeholder="z.B. Salami">
+    <button onclick="addTopping()">Add Topping</button>
+    <ul id="toppingList"></ul>
+    <button onclick="saveToppings()">Save Toppings</button>
+  </div>
+</div>
+<div id="view-events" class = "view">
+  <div class="card" id="eventdisplay" style="display:block;">
+    <h2>Events:</h2>
+    <ul id="eventlist"></ul>
+    <button onclick="listEvents()">Load Events</button>
+  </div>
+</div>
+<div class="card" id="toppingsCard" style="display:none;">
+  <h2>Toppings fuers ausgewaehlte Event:</h2>
+  <ul id="toppingsList"></ul>
 </div>
 
-<div class="card" id="toppingCard" style="display:none;">
-  <h2>Toppings hinzufügen</h2>
-  <input id="toppingInput" placeholder="z.B. Salami">
-  <button onclick="addTopping()">Add Topping</button>
-  <ul id="toppingList"></ul>
-  <button onclick="saveToppings()">Save Toppings</button>
-</div>
 
 <script>
 const API_BASE = '/api'; // wichtig: gleiche Domain
@@ -80,7 +195,7 @@ async function login() {
   token = data.token;
 
   document.getElementById('loginCard').style.display = 'none';
-  document.getElementById('eventCard').style.display = 'block';
+  document.getElementById('topbar1').style.display ='block';
 }
 
 async function createEventHandler() {
@@ -95,7 +210,6 @@ async function createEventHandler() {
     body: JSON.stringify({ name })
     
   });
-  console.log('TOKEN:',token);
   const data = await res.json();
   currentEventId = data.id;
 
@@ -107,7 +221,7 @@ function addTopping() {
   const input = document.getElementById('toppingInput');
   const value = input.value;
 
-  if (!value) return;s
+  if (!value) return;
 
   toppings.push(value);
 
@@ -130,6 +244,232 @@ async function saveToppings() {
 
   alert('Toppings gespeichert 🍕');
 }
+
+async function listEvents() {
+  const res = await fetch(`${API_BASE}/events`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    },
+    
+  });
+  const data = await res.json();
+  console.log(data)
+  const list = document.getElementById('eventlist');
+  list.innerHTML = ''; // reset
+
+for (const event of data) {
+  const li = document.createElement('li');
+
+  const text = document.createElement('span');
+  text.innerText = `${event.id} - ${event.name}`;
+
+  const button = document.createElement('button');
+  button.innerText = 'Edit';
+  button.className = "button2";
+  button.onclick = (e) => {
+    e.stopPropagation(); // 🔥 verhindert Click auf LI
+    editEvent(li, event);
+  };
+
+  //  CLICK AUF DAS GANZE LI
+  li.onclick = () => {
+    selectEvent(li, event);
+  };
+
+  li.appendChild(text);
+  li.appendChild(button);
+  list.appendChild(li);
+}
+
+}
+
+async function editEvent(li, event) {
+  li.innerHTML = event.name; // Inhalt löschen
+
+const input = document.createElement('input');
+  input.value = event.name;
+
+  const saveBtn = document.createElement('button');
+  saveBtn.className = "button2";
+  saveBtn.innerText = 'Save';
+  saveBtn.onclick = () => editEventName(event.id, input.value);
+
+  const backbttn = document.createElement('button');
+  backbttn.innerText = 'Back';
+  backbttn.className = 'button2';
+
+  backbttn.onclick = () => {
+    li.innerHTML = '';
+
+    const text = document.createElement('span');
+    text.innerText = `${event.id} - ${event.name}`;
+
+    const editBtn = document.createElement('button');
+    editBtn.innerText = 'Edit Event Name';
+    editBtn.className = 'button2';
+    editBtn.onclick = () => editEvent(li, event);
+
+    li.appendChild(text);
+    li.appendChild(editBtn);
+  };
+
+  li.appendChild(input);
+  li.appendChild(saveBtn);
+  li.appendChild(backbttn);
+}
+
+async function editEventName(id, newName) {
+  const res = await fetch(`${API_BASE}/events/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    },
+    body: JSON.stringify({ name: newName })
+  });
+
+  const data = await res.json();
+  console.log('Updated:', data);
+}
+
+function selectEvent(li, event) {
+  currentEventId = event.id;
+
+  // alle anderen entfernen
+  document.querySelectorAll('#eventlist li').forEach(el => {
+    el.classList.remove('active');
+  });
+
+  // dieses markieren
+  li.classList.add('active');
+
+  console.log('Selected event:', event);
+  loadToppings(event.id);
+}
+
+
+async function loadToppings(eventId) {
+  const res = await fetch(`${API_BASE}/events/${eventId}/toppings`, {
+    headers: {
+      'Authorization': 'Bearer ' + token
+    }
+  });
+  document.getElementById('toppingsCard').style.display = 'block';
+  const data = await res.json();
+
+  const list = document.getElementById('toppingsList');
+  list.innerHTML = '';
+
+  for (const topping of data) {
+    const li = document.createElement('li');
+
+    const text = document.createElement('span');
+    text.innerText = topping.name;
+
+    const editBtn = document.createElement('button');
+    editBtn.innerText = 'Edit';
+    editBtn.className = 'button2';
+    editBtn.onclick = () => editTopping(li, topping);
+
+    const delBtn = document.createElement('button');
+    delBtn.innerText = 'Delete';
+    delBtn.className = 'button2';
+    delBtn.onclick = () => deleteTopping(topping.id);
+
+    li.appendChild(text);
+    li.appendChild(editBtn);
+    li.appendChild(delBtn);
+
+    list.appendChild(li);
+  }
+
+  renderAddTopping();
+}
+
+function editTopping(li, topping) {
+  li.innerHTML = '';
+
+  const input = document.createElement('input');
+  input.value = topping.name;
+
+  const save = document.createElement('button');
+  save.innerText = 'Save';
+  save.className = 'button2';
+  save.onclick = async () => {
+    await fetch(`${API_BASE}/toppings/${topping.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({ name: input.value })
+    });
+
+    loadToppings(currentEventId);
+  };
+
+  li.appendChild(input);
+  li.appendChild(save);
+}
+
+async function deleteTopping(id) {
+  await fetch(`${API_BASE}/toppings/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': 'Bearer ' + token
+    }
+  });
+
+  loadToppings(currentEventId);
+}
+
+function renderAddTopping() {
+  const list = document.getElementById('toppingsList');
+
+  const li = document.createElement('li');
+
+  const input = document.createElement('input');
+  input.placeholder = 'New topping...';
+
+  const addBtn = document.createElement('button');
+  addBtn.innerText = '+';
+  addBtn.className = 'button2';
+
+  addBtn.onclick = async () => {
+    await fetch(`${API_BASE}/events/${currentEventId}/topping`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({ name: input.value })
+    });
+
+    loadToppings(currentEventId);
+  };
+
+  li.appendChild(input);
+  li.appendChild(addBtn);
+
+  list.appendChild(li);
+}
+function setActiveButton(btn) {
+  document.querySelectorAll('.nav-buttons button')
+    .forEach(b => b.classList.remove('active'));
+
+  btn.classList.add('active');
+}
+
+function showView(viewId) {
+  document.querySelectorAll('.view').forEach(v => {
+    v.classList.remove('active');
+  });
+
+  document.getElementById(viewId).classList.add('active');
+}
+
 </script>
 
 </body>
