@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    container_name: pizza-db
+    environment:
+      POSTGRES_USER: pizzauser
+      POSTGRES_PASSWORD: pizzapw
+      POSTGRES_DB: pizza
+    ports:
+      - "5467:5432"
+    volumes:
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+  api:
+    build: .
+    container_name: pizza-api
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgres://pizzauser:pizzapw@db:5467/pizza
+      JWT_SECRET: supersecrethdhehehehe
+      ADMIN_EMAIL: admin@test.com
+      ADMIN_PASSWORD: 12345
+    depends_on:
+      - db

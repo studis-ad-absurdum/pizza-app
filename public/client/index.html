@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pizza Bestellung 🍕</title>
+  <link rel="stylesheet" href="style.css">
+
+<script src="app.js"></script>
+
+</head>
+
+<body>
+<!-- ERSTE SEITE/ LOGIN  VIEW 1  -->
+<div id='view1' class="card view">
+
+<h2>Event Login</h2>
+    <input id="eventligincode" placeholder="Event Login">
+    <button onclick="login()">Weiter</button>
+</div>
+
+
+
+<!-- Falsches Event Passwort Seite view-wrong -->
+<div id="view-wrong" class="view">
+    <h3>Wrong Event Password...pls try again</h3>
+    <button onclick="counternull();loadPage()">Back</button>
+</div>
+
+
+<!-- ZWEITE Topping Seite view 2-->
+<div id = 'view2' class="view">
+<h1 id="eventName">Loading...</h1>
+
+<div id="toppingsContainer"></div>
+<hr>
+<label for="orderNote" class="note-label">📝 Sonderwünsche</label>
+<textarea id="orderNote" placeholder="z.B. extra knusprig..."></textarea>
+<button onclick="submitOrder()">Bestellen</button>
+<button onclick="backpizza()" class="view" id="backbuttonorders">Zu den Bestellten Pizze</button>
+</div>
+
+<!-- LETZE ORDER SEITE view3-->
+<div id="view3" class="view">
+  <h2>Danke für deine Bestellung 🍕</h2>
+  Hier siehst du alle deine bisherigen Bestellungsnummern:
+  <p id="orderInfo"></p>
+  <button onclick="newpizza()">Weitere Pizza Bestellen</button>
+</div>
+
+
+</body>
+</html>

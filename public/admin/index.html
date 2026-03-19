@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Pizza Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+
+<script src="app.js"></script>
+</head>
+<body>
+
+<h1>🍕 Admin Panel</h1>
+<div id="topbar1" class="topbar" style="display:none;">
+  <div class="nav-buttons">
+    <button onclick="showView('view-addEvent')">Events hinzufeugen</button>
+    <button onclick="showView('view-events')">Events anschauen</button>
+    <button onclick="showView('order-view')">Orders</button>
+    <button onclick="showView('kitchen-view')"> Kueche</button>
+  </div>
+</div>
+
+
+<!-- ERSTE VIEW DIE LOGIN CARD-->
+<div class="card" id="loginCard">
+  <h2>Login</h2>
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+</div>
+
+
+<!--Default Order View-->
+<div id="order-view" class="view">
+<h2>Order(s) 66:</h2>
+<ul id="orderlist"></ul>
+</div>
+
+<!--EVENT ERSTELLEN VIEW -->
+<div id = "view-addEvent" class="view">
+  <div class="card" id="eventCard" style="display:block;">
+    <h2>Event erstellen</h2>
+    <input id="eventName" placeholder="Event Name">
+    <button onclick="createEventHandler()">Create Event</button>
+    <p id="eventIdDisplay"></p>
+  </div>
+
+  <div class="card" id="toppingCard" style="display:none;">
+    <h2>Toppings hinzufügen</h2>
+    <input id="toppingInput" placeholder="z.B. Salami">
+    <button onclick="addTopping()">Add Topping</button>
+    <ul id="toppingList"></ul>
+    <button onclick="saveToppings()">Save Toppings</button>
+  </div>
+</div>
+
+<div id="view-events" class = "view">
+  <div class="card" id="eventdisplay" style="display:block;">
+    <h2>Events:</h2>
+    <ul id="eventlist"></ul>
+    <button onclick="listEvents()">Load Events</button>
+  </div>
+
+  <div class="card" id="toppingsCard" style="display:none;">
+    <h2>Toppings fuers ausgewaehlte Event:</h2>
+    <ul id="toppingsList"></ul>
+  </div>
+</div>
+
+<div id="kitchen-view" class="view">
+  <h2>🍕 Küche</h2>
+  <ul id="kitchenList"></ul>
+</div>
+
+
+
+</body>
+</html>

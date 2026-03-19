@@ -1,185 +1,35 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <title>Pizza Admin Panel</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      padding: 20px;
-    }
-    .button2 {
-      background: rgb(77, 125, 216);
-      color: white;
-      border: none;
-      padding: 16px 14px;
-      text-align: center;
-      text-decoration: none;
-      width: auto;
-      display: inline-block;
-      font-size: 12px;
-      cursor: pointer;
-      flex: 0 0 auto;  
-      border-radius: 25%;
-    }
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    input, button {
-      padding: 10px;
-      margin: 5px 0;
-      width: 100%;
-    }
-    button {
-      cursor: pointer;
-      background: black;
-      color: white;
-      border: none;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-    li {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 0;
-      border-bottom: 1px solid #eee;
-    }
-    li span {
-      white-space: nowrap;      /* kein Umbruch */
-      overflow: hidden;
-      text-overflow: ellipsis;  /* ... wenn zu lang */
-      max-width: 80%;
-    }
-    li.active {
-      background: #d1f7f1;
-      border-radius: 6px;
-    }   
-    #toppingsList li {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-body {
-  padding-top: 60px;
-}
-.nav-buttons button.active {
-  background: rgb(40, 150, 130);
-}
-.topbar {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 20%;
-  padding: 12px 20px;
-  display: flex;
-  justify-content: flex-end;
-  z-index: 1000;
+//const { get } = require("../../src/routes/orders");
 
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(8px);
-}
-
-.nav-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.nav-buttons button {
-  background: rgb(81, 225, 201);
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  font-size: 13px;
-  border-radius: 8px;
-  cursor: pointer;
-
-  transition: all 0.2s ease;
-}
-
-/* Hover */
-.nav-buttons button:hover {
-  background: rgb(60, 200, 180);
-  transform: translateY(-1px);
-}
-
-/* Klick-Effekt */
-.nav-buttons button:active {
-  transform: scale(0.95);
-}
-.view {
-  display: none;
-}
-
-.view.active {
-  display: block;
-}
-
-  </style>
-</head>
-<body>
-
-<h1>🍕 Admin Panel</h1>
-<div id="topbar1" class="topbar" style="display:none;">
-  <div class="nav-buttons">
-    <button onclick="showView('view-addEvent')">Events hinzufeugen</button>
-    <button onclick="showView('view-events')">Events anschauen</button>
-    <button onclick="showView('view-orders')">Penis?</button>
-  </div>
-</div>
-
-
-
-<div class="card" id="loginCard">
-  <h2>Login</h2>
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-</div>
-
-
-<div id = "view-addEvent" class="view">
-  <div class="card" id="eventCard" style="display:block;">
-    <h2>Event erstellen</h2>
-    <input id="eventName" placeholder="Event Name">
-    <button onclick="createEventHandler()">Create Event</button>
-    <p id="eventIdDisplay"></p>
-  </div>
-
-  <div class="card" id="toppingCard" style="display:none;">
-    <h2>Toppings hinzufügen</h2>
-    <input id="toppingInput" placeholder="z.B. Salami">
-    <button onclick="addTopping()">Add Topping</button>
-    <ul id="toppingList"></ul>
-    <button onclick="saveToppings()">Save Toppings</button>
-  </div>
-</div>
-<div id="view-events" class = "view">
-  <div class="card" id="eventdisplay" style="display:block;">
-    <h2>Events:</h2>
-    <ul id="eventlist"></ul>
-    <button onclick="listEvents()">Load Events</button>
-  </div>
-</div>
-<div class="card" id="toppingsCard" style="display:none;">
-  <h2>Toppings fuers ausgewaehlte Event:</h2>
-  <ul id="toppingsList"></ul>
-</div>
-
-
-<script>
 const API_BASE = '/api'; // wichtig: gleiche Domain
 
 let token = null;
 let currentEventId = null;
 let toppings = [];
+let activeEventid = null;
+
+
+
+
+async function getactiveEventid() {
+    const res = await fetch(`${API_BASE}/events`, {
+        method: 'GET',
+        headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+        },
+  });
+  const data = await res.json();
+
+  const activeEvent = data.find(e => e.is_active === true);
+
+if (activeEvent) {
+  activeEventid = activeEvent.id;
+}
+if (!activeEvent) {
+  console.error('Kein aktives Event gefunden 😢');
+}
+  console.log(activeEventid);
+};
 
 async function login() {
   const email = document.getElementById('email').value;
@@ -196,6 +46,9 @@ async function login() {
 
   document.getElementById('loginCard').style.display = 'none';
   document.getElementById('topbar1').style.display ='block';
+  document.getElementById('order-view').classList.add('active');
+
+  getactiveEventid();
 }
 
 async function createEventHandler() {
@@ -255,7 +108,7 @@ async function listEvents() {
     
   });
   const data = await res.json();
-  console.log(data)
+  //console.log(data)
   const list = document.getElementById('eventlist');
   list.innerHTML = ''; // reset
 
@@ -266,11 +119,31 @@ for (const event of data) {
   text.innerText = `${event.id} - ${event.name}`;
 
   const button = document.createElement('button');
-  button.innerText = 'Edit';
+  button.innerText = 'Edit Event Name';
   button.className = "button2";
   button.onclick = (e) => {
     e.stopPropagation(); // 🔥 verhindert Click auf LI
     editEvent(li, event);
+  };
+  const activateBtn = document.createElement('button');
+  if (event.is_active) {
+    activateBtn.disabled = true;
+  }
+  activateBtn.innerText = event.is_active ? 'Active ✅' : 'Activate';
+  activateBtn.className = "button2";
+
+  activateBtn.onclick = async (e) => {
+    e.stopPropagation();
+
+    await fetch(`${API_BASE}/events/${event.id}/activate`, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    });
+
+    listEvents(); // 🔄 neu laden
+    getactiveEventid();
   };
 
   //  CLICK AUF DAS GANZE LI
@@ -280,6 +153,12 @@ for (const event of data) {
 
   li.appendChild(text);
   li.appendChild(button);
+  li.appendChild(activateBtn);
+  if (event.is_active) {
+    li.classList.add('active2');
+  }
+
+
   list.appendChild(li);
 }
 
@@ -468,9 +347,102 @@ function showView(viewId) {
   });
 
   document.getElementById(viewId).classList.add('active');
+  if (viewId == 'view-events') listEvents();
+
 }
 
-</script>
 
-</body>
-</html>
+async function loadUnvalidatedOrders() {
+  const list = document.getElementById('orderlist');
+  list.innerHTML = '';
+  console.log(activeEventid);
+  const res = await fetch(`/api/orders/unvalidated/${activeEventid}`);
+  const orders = await res.json();
+
+  for (const order of orders) {
+    const li = document.createElement('li');
+
+    // Text
+    const text = document.createElement('span');
+    const noteText = order.note ? `📝 "${order.note}"` : '';
+    const toppingsText = order.toppings.length > 0
+      ? `(${order.toppings.join(', ')})`
+      : '';
+
+    text.innerText = `🍕 Pizza ${order.id} ${toppingsText} ${noteText}`;
+
+
+    // Button
+    const btn = document.createElement('button');
+    btn.innerText = 'Validieren';
+    btn.className = 'button2';
+
+    btn.onclick = async () => {
+      await validateOrder(order.id);
+      li.remove(); // direkt aus Liste entfernen
+    };
+
+    li.appendChild(text);
+    li.appendChild(btn);
+
+    list.appendChild(li);
+  }
+}
+
+async function validateOrder(orderId) {
+  await fetch(`/api/orders/${orderId}/validate`, {
+    method: 'PATCH'
+  });
+};
+
+async function loadKitchenOrders() {
+  const list = document.getElementById('kitchenList');
+  list.innerHTML = '';
+
+  if (!activeEventid) return;
+
+  const res = await fetch(`/api/orders/validated/${activeEventid}`);
+  const orders = await res.json();
+  console.log(orders);
+  console.log(activeEventid,"Penis");
+
+  for (const order of orders) {
+    const li = document.createElement('li');
+
+    const text = document.createElement('span');
+// 🍕 toppings hübsch anzeigen
+    const toppingsText = order.toppings.length > 0
+      ? `(${order.toppings.join(', ')})`
+      : '(plain sad pizza 😢)';
+    const noteText = order.note
+      ? `📝 "${order.note}"`
+      : '';
+    text.innerText=''
+    text.innerText = `🍕 Pizza ${order.id} ${toppingsText} ${noteText} `;
+
+    const btn = document.createElement('button');
+    btn.innerText = 'Fertig';
+    btn.className = 'button2';
+
+    btn.onclick = async () => {
+      await markAsReady(order.id);
+      li.remove(); // direkt aus Liste entfernen
+    };
+
+    li.appendChild(text);
+    li.appendChild(btn);
+
+    list.appendChild(li);
+  }
+}
+
+async function markAsReady(orderId) {
+  await fetch(`/api/orders/${orderId}/fertig`, {
+    method: 'PATCH'
+  });
+}
+
+
+
+setInterval(loadKitchenOrders, 3000);
+setInterval(loadUnvalidatedOrders, 5000);

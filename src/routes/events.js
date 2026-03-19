@@ -35,6 +35,48 @@ router.put('/:id', auth, async (req, res) => {
   res.json(result.rows[0]);
 });
 
+router.post('/:id/activate', auth, async (req, res) => {
+  const { id } = req.params;
+
+  await pool.query(
+    'UPDATE events SET is_active = (id = $1)',
+    [id]
+  );
+
+  res.send('activated');
+});
+// get active Event ID i guess
+router.get('/active', async (req, res) => {
+  const result = await pool.query(
+    'SELECT * FROM events WHERE is_active = true LIMIT 1'
+  );
+
+  res.json(result.rows[0]);
+});
+
+router.get('/active-with-toppings', async (req, res) => {
+  const eventResult = await pool.query(
+    'SELECT * FROM events WHERE is_active = true LIMIT 1'
+  );
+
+  if (eventResult.rows.length === 0) {
+    return res.status(404).json({ error: 'No active event' });
+  }
+
+  const event = eventResult.rows[0];
+
+  const toppingsResult = await pool.query(
+    'SELECT * FROM toppings WHERE event_id = $1',
+    [event.id]
+  );
+
+  res.json({
+    event,
+    toppings: toppingsResult.rows
+  });
+});
+
+
 
 
 module.exports = router ;
