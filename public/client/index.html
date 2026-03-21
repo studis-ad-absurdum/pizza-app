@@ -11,7 +11,13 @@
 <body>
 <!-- ERSTE SEITE/ LOGIN  VIEW 1  -->
 <div id="view1" class="view">
-  <div class="container">
+<div class="container">
+  <div class="status-legend">
+    <h1>Wilkommen bei Stasu-Pizza</h1>
+    Wir machen Pizza fuer unsere Events.
+    Solltest du gerade auf einem Event von uns sein, dann such das Eventpasswort und gib es ein um dir eine Pizza zu bestellen.
+  </div>
+
     <div class="card">
       <h2>Event Login</h2>
       <input id="eventligincode" placeholder="Event Login">
@@ -19,7 +25,7 @@
           <button onclick="login()">Weiter</button>
       </div>
     </div>
-  </div>
+</div>
 </div>
 
 
@@ -40,6 +46,12 @@
 <div class="view active" id="view2">
   <div class="container">
     <h1 id="eventName">Loading...</h1>
+    <div class="status-legend">
+      Hier kannst du dir eine Pizza konfigurieren! <br>
+      - 1x Pizza mit beliebig vielen Toppings: min. 5€ Spende. <br>
+      Basis ist immer Teig + Pizzasoße:
+
+    </div>
     
     <div id="toppingsContainer"></div>
 
