@@ -28,7 +28,10 @@
 <div id="view-wrong" class="view">
   <div class="container">
     <h3>Wrong Event Password...pls try again</h3>
-    <button onclick="counternull();loadPage()">Back</button>
+    <div class="button-container">
+      <button onclick="counternull();loadPage()">Back</button>
+    </div>
+    
   </div>
 </div>
 
@@ -59,12 +62,42 @@
 <div id="view3" class="view">
   <div class="container">
     <h2>Danke für deine Bestellung 🍕</h2>
-    Hier siehst du alle deine bisherigen Bestellungsnummern:
+
+    <div class="status-legend">
+      <h3>Was bedeuten die Status?</h3>
+
+      <div class="legend-item">
+        <strong>⏳ Wartet auf Bestätigung:</strong>
+        <p>
+          Deine Bestellung muss noch freigeschaltet werden. 
+          Das passiert, sobald du bei der Spendenkasse warst und deinen Beitrag geleistet hast. 
+          Du kannst dafür PayPal oder die Kasse vor Ort nutzen.
+        </p>
+      </div>
+
+      <div class="legend-item">
+        <strong>👨‍🍳 In Zubereitung:</strong>
+        <p>
+          Deine Pizza wurde bestätigt und wird gerade in der Küche vorbereitet. 
+          Lehn dich zurück – sie kommt bald frisch aus dem Ofen.
+        </p>
+      </div>
+
+      <div class="legend-item">
+        <strong>✅ Fertig:</strong>
+        <p>
+          Deine Pizza ist fertig! Hol sie bitte möglichst schnell an der Küche ab, 
+          solange sie noch heiß und perfekt ist.
+        </p>
+      </div>
+    </div>
+
+    <h3>Deine Bestellungen</h3>
     <p id="orderInfo"></p>
+
     <div class="button-container">
       <button onclick="newpizza()">Weitere Pizza Bestellen</button>
     </div>
-    
   </div>
 </div>
 

@@ -52,7 +52,9 @@ async function login() {
 }
 
 async function createEventHandler() {
-  const name = document.getElementById('eventName').value;
+  const name = document.getElementById('eventName').value; 
+  const password = document.getElementById('eventPassword').value;
+
 
   const res = await fetch(`${API_BASE}/events`, {
     method: 'POST',
@@ -60,9 +62,12 @@ async function createEventHandler() {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + token
     },
-    body: JSON.stringify({ name })
-    
+    body: JSON.stringify({
+      name: name,
+      password: password
+    })
   });
+  
   const data = await res.json();
   currentEventId = data.id;
 

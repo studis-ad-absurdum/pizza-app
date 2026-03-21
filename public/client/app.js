@@ -22,21 +22,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 async function login() {
-    const eventpw = document.getElementById('eventligincode').value;
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    if (eventpw == "sherm"){
-        viewcounter = 1;
-        localStorage.setItem('logedin', '1');
-        loadPage();
-    }
-    else{
-        viewcounter=3
-        loadPage();
-       
-        
-  };
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const eventpw = document.getElementById('eventligincode').value;
+  const activeEventRes = await fetch('/api/events/active');
+  const event = await activeEventRes.json();
 
+  const res = await fetch('/api/events/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      eventId: event.id,
+      password: eventpw
+    })
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    localStorage.setItem('logedin', '1');
+    loadPage();
+  } else{
+        viewcounter=3
+        loadPage(); 
+  };
+  
 };
+
+
+
 function counternull(){
     viewcounter=0;
 };
@@ -61,6 +74,10 @@ async function loadPage() {
   const res = await fetch(`${API_BASE}/events/active-with-toppings`);
   const data = await res.json();
   currentEventId = data.event.id;
+
+  document.getElementById('eventName').innerText =
+  data.event.name || 'Pizza Event 🍕';
+
    const orders = JSON.parse(localStorage.getItem(`orders_event_${currentEventId}`) || '[]');
    const loginstate = JSON.parse(localStorage.getItem(`logedin`));
    if (loginstate == 1 && viewcounter==0){
@@ -233,7 +250,7 @@ async function showOrders() {
       // 🍕 toppings anzeigen
       const toppingsText = order.toppings.length > 0
         ? `(${order.toppings.join(', ')})`
-        : '(plain sad pizza 😢)';
+        : '(Nur Teig und Soße...)';
       const noteText = order.note ? `📝 "${order.note}"` : '';
 
 const card = document.createElement('div');
@@ -241,7 +258,7 @@ card.className = 'order-card';
 
 card.innerHTML = `
   <div class="order-header">
-    <span class="order-id">🍕 Pizza ${order.id}</span>
+    <span class="order-id">Pizzanummer:  ${order.id}</span>
     <span class="order-status ${getStatusClass(order)}">
       ${getStatusText(order)}
     </span>

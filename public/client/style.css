@@ -98,6 +98,8 @@ textarea {
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: 12px;
   margin-top: 12px;
+  overflow: hidden;
+  padding-bottom: 5%;
 }
 
 .topping-name {
@@ -121,8 +123,28 @@ textarea {
 
 .topping-card.selected {
   border: 2px solid #51e1c9;
-  transform: scale(1.05);
   box-shadow: 0 0 12px rgba(81, 225, 201, 0.6);
+}
+
+.topping-check {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 14px;
+
+  opacity: 0;              /* 🔥 DAS ist entscheidend */
+  pointer-events: none;    /* optional */
+  transition: opacity 0.2s ease;
+}
+
+/* nur sichtbar wenn ausgewählt */
+.topping-card.selected .topping-check {
+  opacity: 1;
+}
+
+
+.topping-card:active {
+  transform: scale(0.97);
 }
 
 /* Topping Icon */
@@ -142,9 +164,33 @@ textarea {
   font-family: sans-serif;
 }
 
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.order-id {
+  font-size: 18px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.order-status {
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  flex-shrink: 0; /* 🔥 wichtig */
+}
+
+
+
+
 /* Status Farben */
 .status-waiting { background: #555; }
-.status-cooking { background: orange; }
+.status-cooking { background: rgb(87, 57, 0); }
 .status-ready { background: green; }
 
 /* Responsive Text */
@@ -222,4 +268,27 @@ body {
 
 .button-container button:active {
   transform: scale(0.96);
+}
+
+.status-legend {
+  margin: 16px 0;
+  padding: 12px;
+  background: #1e1e1e;
+  border-radius: 12px;
+}
+
+.legend-item {
+  margin-bottom: 12px;
+}
+
+.legend-item strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #51e1c9;
+}
+
+.legend-item p {
+  margin: 0;
+  color: #ccc;
+  font-size: 14px;
 }

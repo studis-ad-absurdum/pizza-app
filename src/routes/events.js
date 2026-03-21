@@ -3,15 +3,15 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db');
 const auth = require('../middleware/auth');
-
+const bcrypt = require('bcrypt'); 
 
 
 router.post('/', auth, async (req, res) => {
-  const { name } = req.body;
-
+  const { name, password } = req.body;
+  const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
   const result = await pool.query(
-    'INSERT INTO events (name) VALUES ($1) RETURNING *',
-    [name]
+    'INSERT INTO events (name, event_password) VALUES ($1, $2) RETURNING *',
+    [name, hashedPassword]
   );
 
   res.json(result.rows[0]);
@@ -45,6 +45,7 @@ router.post('/:id/activate', auth, async (req, res) => {
 
   res.send('activated');
 });
+
 // get active Event ID i guess
 router.get('/active', async (req, res) => {
   const result = await pool.query(
@@ -75,6 +76,46 @@ router.get('/active-with-toppings', async (req, res) => {
     toppings: toppingsResult.rows
   });
 });
+
+
+// POST /api/events/login
+router.post('/login', async (req, res) => {
+  const { eventId, password } = req.body;
+
+  try {
+    // 1️⃣ Event aus DB holen
+    const result = await pool.query(
+      'SELECT * FROM events WHERE id = $1 LIMIT 1',
+      [eventId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Event nicht gefunden' });
+    }
+
+    const event = result.rows[0];
+
+    // 2️⃣ Passwort prüfen
+    if (!event.event_password) {
+      return res.status(403).json({ error: 'Kein Passwort für dieses Event gesetzt' });
+    }
+
+    const match = await bcrypt.compare(password, event.event_password);
+    if (!match) {
+      return res.status(403).json({ error: 'Falsches Passwort' });
+    }
+
+    // 3️⃣ Login erfolgreich
+    res.json({ success: true, event });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server Fehler' });
+  }
+});
+
+
+
+
 
 
 
