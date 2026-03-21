@@ -23,6 +23,7 @@ services:
       JWT_SECRET: supersecrethdhehehehe
       ADMIN_EMAIL: admin@test.com
       ADMIN_PASSWORD: 12345
+      PORT: 3001
     depends_on:
       db:
         condition: service_started
@@ -32,10 +33,10 @@ services:
  #   labels:
  #     - "traefik.enable=true"
  #     - "traefik.http.routers.pizza.entrypoints=http"
- #     - "traefik.http.routers.pizza.rule=Host(`pizza.stasu.de`)"   # domain eingeben
+ #     - "traefik.http.routers.pizza.rule=Host(`pizza.stasu.de`)"
  #     - "traefik.http.routers.pizza.middlewares=redirect@file"
  #     - "traefik.http.routers.pizza-secure.entrypoints=https"
- #     - "traefik.http.routers.pizza-secure.rule=Host(`pizza.stasu.de`)"  # domain eingeben
+ #     - "traefik.http.routers.pizza-secure.rule=Host(`pizza.stasu.de`)"
  #     - "traefik.http.routers.pizza-secure.tls=true"
  #     - "traefik.http.routers.pizza-secure.tls.certresolver=mytlschallenge"
  #     - "traefik.http.routers.pizza-secure.service=pizza"

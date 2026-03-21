@@ -53,6 +53,10 @@ function backpizza(){
 };
 
 async function loadPage() {
+    // sofort alle Views resetten
+  //document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  //document.getElementById('view1').classList.add('active'); // default View1
+
  console.log(viewcounter);
   const res = await fetch(`${API_BASE}/events/active-with-toppings`);
   const data = await res.json();
@@ -88,9 +92,13 @@ if(viewcounter==3){
 };
 
 
-if(orders && orders.length > 0){
-  document.getElementById('backbuttonorders').classList.add('active');
-};
+const backBtn = document.getElementById('backbuttonorders');
+
+if (orders && orders.length > 0) {
+  backBtn.classList.remove('hidden');
+} else {
+  backBtn.classList.add('hidden');
+}
 
 
 // Ab hier Toppingsauswahl:

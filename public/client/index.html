@@ -26,17 +26,23 @@
 </div>
 
 
-<!-- ZWEITE Topping Seite view 2-->
-<div id = 'view2' class="view">
-<h1 id="eventName">Loading...</h1>
+<!--Bestelle SEite-->
+<div class="view active" id="view2">
+  <h1 id="eventName">Loading...</h1>
+  
+  <div id="toppingsContainer"></div>
 
-<div id="toppingsContainer"></div>
-<hr>
-<label for="orderNote" class="note-label">📝 Sonderwünsche</label>
-<textarea id="orderNote" placeholder="z.B. extra knusprig..."></textarea>
-<button onclick="submitOrder()">Bestellen</button>
-<button onclick="backpizza()" class="view" id="backbuttonorders">Zu den Bestellten Pizze</button>
+  <label for="orderNote" class="note-label">📝 Sonderwünsche</label>
+  <textarea id="orderNote" placeholder="z.B. extra knusprig..."></textarea>
+
+  <!-- Fixed Button Container -->
+  <div class="button-container">
+    <button onclick="submitOrder()">Bestellen 🍕</button>
+    <button onclick="backpizza()" class="hidden" id="backbuttonorders">Zu den Bestellten Pizzen</button>
+  </div>
 </div>
+
+
 
 <!-- LETZE ORDER SEITE view3-->
 <div id="view3" class="view">
