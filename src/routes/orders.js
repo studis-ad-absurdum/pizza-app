@@ -193,5 +193,104 @@ router.patch('/:id/fertig', async (req, res) => {
   res.json({ success: true });
 });
 
+router.get('/fertig/:eventId', async (req, res) => {
+  const { eventId } = req.params;
+
+  const result = await pool.query(`
+    SELECT 
+      o.id,
+      o.note,
+      t.name AS topping
+    FROM orders o
+    LEFT JOIN order_items oi ON o.id = oi.order_id
+    LEFT JOIN toppings t ON oi.topping_id = t.id
+    WHERE o.event_id = $1
+      AND o.fertig = true
+      AND o.abgeholt = false
+    ORDER BY o.id
+  `, [eventId]);
+
+  // 🔥 Gruppieren nach Order
+  const ordersMap = {};
+
+  for (const row of result.rows) {
+    if (!ordersMap[row.id]) {
+      ordersMap[row.id] = {
+        id: row.id,
+        note: row.note,
+        toppings: []
+      };
+    }
+
+    if (row.topping) {
+      ordersMap[row.id].toppings.push(row.topping);
+    }
+  }
+
+  const orders = Object.values(ordersMap);
+
+  res.json(orders);
+});
+
+router.patch('/:id/abgeholt', async (req, res) => {
+  const { id } = req.params;
+
+  await pool.query(
+    'UPDATE orders SET abgeholt = true WHERE id = $1',
+    [id]
+  );
+
+  res.json({ success: true });
+});
+
+router.get('/public/fertig', async (req, res) => {
+  try {
+    // Get active event
+    const eventResult = await pool.query('SELECT id FROM events WHERE is_active = true LIMIT 1');
+    if (eventResult.rows.length === 0) {
+      return res.json([]);
+    }
+    const eventId = eventResult.rows[0].id;
+
+    const result = await pool.query(`
+      SELECT 
+        o.id,
+        o.note,
+        t.name AS topping
+      FROM orders o
+      LEFT JOIN order_items oi ON o.id = oi.order_id
+      LEFT JOIN toppings t ON oi.topping_id = t.id
+      WHERE o.event_id = $1
+        AND o.fertig = true
+        AND o.abgeholt = false
+      ORDER BY o.id
+    `, [eventId]);
+
+    // 🔥 Gruppieren nach Order
+    const ordersMap = {};
+
+    for (const row of result.rows) {
+      if (!ordersMap[row.id]) {
+        ordersMap[row.id] = {
+          id: row.id,
+          note: row.note,
+          toppings: []
+        };
+      }
+
+      if (row.topping) {
+        ordersMap[row.id].toppings.push(row.topping);
+      }
+    }
+
+    const orders = Object.values(ordersMap);
+
+    res.json(orders);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Fehler');
+  }
+});
+
 
 module.exports = router;

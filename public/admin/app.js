@@ -353,6 +353,7 @@ function showView(viewId) {
 
   document.getElementById(viewId).classList.add('active');
   if (viewId == 'view-events') listEvents();
+  if (viewId == 'pickup-view') loadPickupOrders();
 
 }
 
@@ -441,8 +442,51 @@ async function loadKitchenOrders() {
   }
 }
 
+async function loadPickupOrders() {
+  const list = document.getElementById('pickupList');
+  list.innerHTML = '';
+
+  if (!activeEventid) return;
+
+  const res = await fetch(`/api/orders/fertig/${activeEventid}`);
+  const orders = await res.json();
+
+  for (const order of orders) {
+    const li = document.createElement('li');
+
+    const text = document.createElement('span');
+    const toppingsText = order.toppings.length > 0
+      ? `(${order.toppings.join(', ')})`
+      : '(plain sad pizza 😢)';
+    const noteText = order.note
+      ? `📝 "${order.note}"`
+      : '';
+    text.innerText = `🍕 Pizza ${order.id} ${toppingsText} ${noteText} `;
+
+    const btn = document.createElement('button');
+    btn.innerText = 'Abgeholt';
+    btn.className = 'button2';
+
+    btn.onclick = async () => {
+      await markAsPickedUp(order.id);
+      li.remove(); // direkt aus Liste entfernen
+    };
+
+    li.appendChild(text);
+    li.appendChild(btn);
+
+    list.appendChild(li);
+  }
+}
+
 async function markAsReady(orderId) {
   await fetch(`/api/orders/${orderId}/fertig`, {
+    method: 'PATCH'
+  });
+}
+
+async function markAsPickedUp(orderId) {
+  await fetch(`/api/orders/${orderId}/abgeholt`, {
     method: 'PATCH'
   });
 }
@@ -451,3 +495,4 @@ async function markAsReady(orderId) {
 
 setInterval(loadKitchenOrders, 3000);
 setInterval(loadUnvalidatedOrders, 5000);
+setInterval(loadPickupOrders, 3000);

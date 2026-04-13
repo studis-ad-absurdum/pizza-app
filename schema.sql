@@ -33,6 +33,7 @@ CREATE TABLE orders (
     created_at TIMESTAMP DEFAULT now(),
     validated BOOLEAN DEFAULT false,
     fertig BOOLEAN DEFAULT false,
+    abgeholt BOOLEAN DEFAULT false,
     note TEXT                       -- neu: Freitext für Wünsche
 );
 

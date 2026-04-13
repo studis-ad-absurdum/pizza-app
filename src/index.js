@@ -24,6 +24,11 @@ app.use('/api', toppingRoutes);
 app.use('/admin', express.static(path.join(__dirname, '../public/admin')));
 app.use('/', express.static(path.join(__dirname,'../public/client')));
 
+// pizza page
+app.get('/pizza', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/pizza.html'));
+});
+
 const PORT = process.env.PORT || 3000;
 //app.listen(PORT, () => console.log(`Server läuft auf ${PORT}`));
 

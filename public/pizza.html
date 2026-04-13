@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fertige Pizzen 🍕</title>
+  <link rel="stylesheet" href="/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+  <div class="container">
+    <h1>Fertige Pizzen zur Abholung</h1>
+    <div class="status-legend">
+      Hier siehst du alle Pizzen, die fertig sind und noch nicht abgeholt wurden.
+    </div>
+
+    <div id="pizzasContainer"></div>
+  </div>
+
+  <script>
+    async function loadPizzas() {
+      try {
+        const res = await fetch('/api/orders/public/fertig');
+        const pizzas = await res.json();
+        const container = document.getElementById('pizzasContainer');
+        container.innerHTML = '';
+
+        if (pizzas.length === 0) {
+          container.innerHTML = '<p>Keine fertigen Pizzen zur Abholung.</p>';
+          return;
+        }
+
+        pizzas.forEach(pizza => {
+          const card = document.createElement('div');
+          card.className = 'order-card';
+
+          const toppingsText = pizza.toppings.length > 0
+            ? `(${pizza.toppings.join(', ')})`
+            : '(plain sad pizza 😢)';
+          const noteText = pizza.note ? `📝 "${pizza.note}"` : '';
+
+          card.innerHTML = `
+            <div class="order-header">
+              <div class="order-id">🍕 Pizza ${pizza.id}</div>
+              <div class="order-status status-ready">✅ Fertig</div>
+            </div>
+            <div>${toppingsText} ${noteText}</div>
+          `;
+
+          container.appendChild(card);
+        });
+      } catch (error) {
+        console.error('Error loading pizzas:', error);
+        document.getElementById('pizzasContainer').innerHTML = '<p>Fehler beim Laden der Pizzen.</p>';
+      }
+    }
+
+    // Load on page load
+    loadPizzas();
+
+    // Refresh every 10 seconds
+    setInterval(loadPizzas, 10000);
+  </script>
+</body>
+</html></content>
